@@ -87,7 +87,7 @@ class DashboardController extends ResourceController
                     "message"=>'Anda belum pernah mendaftarkan difabel',
                     "data"=>[]], 200); 
             }
-        } catch (\Throwable $th) {
+        } catch (\Exception $th) {
             return $this->respond(["status" => 0,"message"=>$th->getMessage(),'data' => []], 400); 
         } 
     }

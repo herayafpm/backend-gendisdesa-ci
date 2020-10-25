@@ -36,8 +36,7 @@ class IdentitasDifabelModel extends Model
         $orangTuaModel = new \App\Models\OrangTuaModel();
         $no = 0;
         foreach ($difabels as $difabel) {
-            $difabels[$no]['ayah'] = $OrangTuaModel->where(['difabel_no_urut'=>$difabel['difabel_no_urut'],'jenis' => "Pria"])->first();
-            $difabels[$no]['ibu'] = $OrangTuaModel->where(['difabel_no_urut'=>$difabel['difabel_no_urut'],'jenis' => "Pria"])->first();
+            $difabels[$no]['orang_tua'] = $orangTuaModel->where(['difabel_no_urut'=>$difabel['difabel_no_urut']])->first();
             $no++;
         }
         return $difabels;
