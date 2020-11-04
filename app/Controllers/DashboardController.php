@@ -13,7 +13,7 @@ class DashboardController extends ResourceController
         if($request->getStatusCode() == 200){
             $response = json_decode($request->getBody(),true);
             $no = 0;
-            $urlUpload = config('App')->baseURL."uploads";
+            $urlUpload = config('App')->baseURL."/uploads";
             foreach ($response['data'] as $image) {
                 [$url,$file] = explode("images/",$image);
                 if(!file_exists("uploads/$file")){
@@ -72,21 +72,14 @@ class DashboardController extends ResourceController
         $limit = $dataGet["limit"] ?? 10;
         $offset = $dataGet["offset"] ?? 0;
         try {
-            $difabels = $this->model->getDifabels($user['user_nik'],$limit,$offset);
+            $data = $this->model->getDifabels($user['user_nik'],$limit,$offset);
             $current_page = ($offset == 0)?1:($offset/$limit) * $limit;
             $total = $this->model->countDifabels();
             $total_page = ceil($total/$limit);
-            if($difabels){
-                return $this->respond([
-                    "status" => 1,
-                    "message"=>"Berhasil mengambil data",
-                    "data"=>compact('current_page','total','total_page','difabels')], 200); 
-            }else{
-                return $this->respond([
-                    "status" => 0,
-                    "message"=>'Anda belum pernah mendaftarkan difabel',
-                    "data"=>[]], 200); 
-            }
+            return $this->respond([
+				"status" => 1,
+				"message"=>"Berhasil mengambil data",
+				"data"=>compact('current_page','total','total_page','data')], 200); 
         } catch (\Exception $th) {
             return $this->respond(["status" => 0,"message"=>$th->getMessage(),'data' => []], 400); 
         } 
@@ -175,47 +168,44 @@ class DashboardController extends ResourceController
                 "difabel_pelatihan_lainnya" => htmlspecialchars($dataJson->difabel_pelatihan_lainnya ?? null),
                 "kebutuhan_perawatan_id" => htmlspecialchars($dataJson->kebutuhan_perawatan_id ?? 0),
                 "difabel_perawatan_lainnya" => htmlspecialchars($dataJson->difabel_perawatan_lainnya ?? null),
+				"difabel_permasalahan" => htmlspecialchars($dataJson->difabel_permasalahan ?? null),
                 "kondisi_difabel_id" => htmlspecialchars($dataJson->kondisi_difabel_id ?? 0),
                 "difabel_image" => htmlspecialchars($dataJson->difabel_image ?? 'kosong.png'),
             ];
-            $dataAyah = [
+            $dataOrangTua = [
                 "difabel_no_urut" => $noUrut,
-                "ayah_nama" => strtoupper(htmlspecialchars($dataJson->ayah->ayah_nama ?? '0')),
-                "ayah_nik" => htmlspecialchars($dataJson->ayah->ayah_nik ?? '0'),
-                "ayah_no_kk" => htmlspecialchars($dataJson->ayah->ayah_no_kk ?? '0'),
-                "ayah_tempat_lahir" => strtoupper(htmlspecialchars($dataJson->ayah->ayah_tempat_lahir ?? '0')),
-                "ayah_tanggal_lahir" => htmlspecialchars($dataJson->ayah->ayah_tanggal_lahir ?? '1000-01-01'),
-                "ayah_agama_id" => htmlspecialchars($dataJson->ayah->ayah_agama_id ?? 0),
-                "ayah_alamat_jalan_perumahan" => strtoupper(htmlspecialchars($dataJson->ayah->ayah_alamat_jalan_perumahan ?? '0')),
-                "ayah_alamat_rt" => htmlspecialchars($dataJson->ayah->ayah_alamat_rt ?? '0'),
-                "ayah_alamat_rw" => htmlspecialchars($dataJson->ayah->ayah_alamat_rw ?? '0'),
-                "ayah_alamat_desa" => strtoupper(htmlspecialchars($dataJson->ayah->ayah_alamat_desa ?? '0')),
-                "ayah_alamat_kecamatan" => strtoupper(htmlspecialchars($dataJson->ayah->ayah_alamat_kecamatan ?? '0')),
-                "ayah_alamat_kabupaten" => strtoupper(htmlspecialchars($dataJson->ayah->ayah_alamat_kabupaten ?? '0')),
-                "ayah_alamat_telepon" => htmlspecialchars($dataJson->ayah->ayah_alamat_telepon ?? '0')
-            ];
-            $dataIbu = [
-                "difabel_no_urut" => $noUrut,
-                "ibu_nama" => strtoupper(htmlspecialchars($dataJson->ibu->ibu_nama ?? '0')),
-                "ibu_nik" => htmlspecialchars($dataJson->ibu->ibu_nik ?? '0'),
-                "ibu_no_kk" => htmlspecialchars($dataJson->ibu->ibu_no_kk ?? '0'),
-                "ibu_tempat_lahir" => strtoupper(htmlspecialchars($dataJson->ibu->ibu_tempat_lahir ?? '0')),
-                "ibu_tanggal_lahir" => htmlspecialchars($dataJson->ibu->ibu_tanggal_lahir ?? '1000-01-01'),
-                "ibu_agama_id" => htmlspecialchars($dataJson->ibu->ibu_agama_id ?? 0),
-                "ibu_alamat_jalan_perumahan" => strtoupper(htmlspecialchars($dataJson->ibu->ibu_alamat_jalan_perumahan ?? '0')),
-                "ibu_alamat_rt" => htmlspecialchars($dataJson->ibu->ibu_alamat_rt ?? '0'),
-                "ibu_alamat_rw" => htmlspecialchars($dataJson->ibu->ibu_alamat_rw ?? '0'),
-                "ibu_alamat_desa" => strtoupper(htmlspecialchars($dataJson->ibu->ibu_alamat_desa ?? '0')),
-                "ibu_alamat_kecamatan" => strtoupper(htmlspecialchars($dataJson->ibu->ibu_alamat_kecamatan ?? '0')),
-                "ibu_alamat_kabupaten" => strtoupper(htmlspecialchars($dataJson->ibu->ibu_alamat_kabupaten ?? '0')),
-                "ibu_alamat_telepon" => htmlspecialchars($dataJson->ibu->ibu_alamat_telepon ?? '0')
+                "ayah_nama" => strtoupper(htmlspecialchars($dataJson->orang_tua->ayah_nama ?? '0')),
+                "ayah_nik" => htmlspecialchars($dataJson->orang_tua->ayah_nik ?? '0'),
+                "ayah_no_kk" => htmlspecialchars($dataJson->orang_tua->ayah_no_kk ?? '0'),
+                "ayah_tempat_lahir" => strtoupper(htmlspecialchars($dataJson->orang_tua->ayah_tempat_lahir ?? '0')),
+                "ayah_tanggal_lahir" => htmlspecialchars($dataJson->orang_tua->ayah_tanggal_lahir ?? '1000-01-01'),
+                "ayah_agama_id" => htmlspecialchars($dataJson->orang_tua->ayah_agama_id ?? 0),
+                "ayah_alamat_jalan_perumahan" => strtoupper(htmlspecialchars($dataJson->orang_tua->ayah_alamat_jalan_perumahan ?? '0')),
+                "ayah_alamat_rt" => htmlspecialchars($dataJson->orang_tua->ayah_alamat_rt ?? '0'),
+                "ayah_alamat_rw" => htmlspecialchars($dataJson->orang_tua->ayah_alamat_rw ?? '0'),
+                "ayah_alamat_desa" => strtoupper(htmlspecialchars($dataJson->orang_tua->ayah_alamat_desa ?? '0')),
+                "ayah_alamat_kecamatan" => strtoupper(htmlspecialchars($dataJson->orang_tua->ayah_alamat_kecamatan ?? '0')),
+                "ayah_alamat_kabupaten" => strtoupper(htmlspecialchars($dataJson->orang_tua->ayah_alamat_kabupaten ?? '0')),
+                "ayah_alamat_telepon" => htmlspecialchars($dataJson->orang_tua->ayah_alamat_telepon ?? '0'),
+                "ibu_nama" => strtoupper(htmlspecialchars($dataJson->orang_tua->ibu_nama ?? '0')),
+                "ibu_nik" => htmlspecialchars($dataJson->orang_tua->ibu_nik ?? '0'),
+                "ibu_no_kk" => htmlspecialchars($dataJson->orang_tua->ibu_no_kk ?? '0'),
+                "ibu_tempat_lahir" => strtoupper(htmlspecialchars($dataJson->orang_tua->ibu_tempat_lahir ?? '0')),
+                "ibu_tanggal_lahir" => htmlspecialchars($dataJson->orang_tua->ibu_tanggal_lahir ?? '1000-01-01'),
+                "ibu_agama_id" => htmlspecialchars($dataJson->orang_tua->ibu_agama_id ?? 0),
+                "ibu_alamat_jalan_perumahan" => strtoupper(htmlspecialchars($dataJson->orang_tua->ibu_alamat_jalan_perumahan ?? '0')),
+                "ibu_alamat_rt" => htmlspecialchars($dataJson->orang_tua->ibu_alamat_rt ?? '0'),
+                "ibu_alamat_rw" => htmlspecialchars($dataJson->orang_tua->ibu_alamat_rw ?? '0'),
+                "ibu_alamat_desa" => strtoupper(htmlspecialchars($dataJson->orang_tua->ibu_alamat_desa ?? '0')),
+                "ibu_alamat_kecamatan" => strtoupper(htmlspecialchars($dataJson->orang_tua->ibu_alamat_kecamatan ?? '0')),
+                "ibu_alamat_kabupaten" => strtoupper(htmlspecialchars($dataJson->orang_tua->ibu_alamat_kabupaten ?? '0')),
+                "ibu_alamat_telepon" => htmlspecialchars($dataJson->orang_tua->ibu_alamat_telepon ?? '0')
             ];
             $insert = $this->model->insertData($dataDifabel);
             if($insert){
-                $orangtua = $dataAyah + $dataIbu;
                 $orangtuaModel =  new \App\Models\OrangTuaModel();
-                $orangtuaModel->save($orangtua);
-                return $this->respond(["status" => 1,"message" => 'berhasil mendaftar','data' => []], 400); 
+                $orangtuaModel->save($dataOrangTua);
+                return $this->respond(["status" => 1,"message" => 'berhasil mendaftarkan difabel','data' => []], 200); 
             }else{
                 return $this->respond(["status" => 0,"message" => 'gagal mendaftarkan difabel','data' => []], 400); 
             }
@@ -273,38 +263,36 @@ class DashboardController extends ResourceController
                 "difabel_pelatihan_lainnya" => htmlspecialchars($dataJson->difabel_pelatihan_lainnya ?? null),
                 "kebutuhan_perawatan_id" => htmlspecialchars($dataJson->kebutuhan_perawatan_id ?? 0),
                 "difabel_perawatan_lainnya" => htmlspecialchars($dataJson->difabel_perawatan_lainnya ?? null),
+				        "difabel_permasalahan" => htmlspecialchars($dataJson->difabel_permasalahan ?? ""),
                 "kondisi_difabel_id" => htmlspecialchars($dataJson->kondisi_difabel_id ?? 0),
-                "difabel_image" => htmlspecialchars($dataJson->difabel_image ?? 'kosong.png'),
             ];
-            $dataAyah = [
-                "ayah_nama" => strtoupper(htmlspecialchars($dataJson->ayah->ayah_nama ?? '0')),
-                "ayah_nik" => htmlspecialchars($dataJson->ayah->ayah_nik ?? '0'),
-                "ayah_no_kk" => htmlspecialchars($dataJson->ayah->ayah_no_kk ?? '0'),
-                "ayah_tempat_lahir" => strtoupper(htmlspecialchars($dataJson->ayah->ayah_tempat_lahir ?? '0')),
-                "ayah_tanggal_lahir" => htmlspecialchars($dataJson->ayah->ayah_tanggal_lahir ?? '1000-01-01'),
-                "ayah_agama_id" => htmlspecialchars($dataJson->ayah->ayah_agama_id ?? 0),
-                "ayah_alamat_jalan_perumahan" => strtoupper(htmlspecialchars($dataJson->ayah->ayah_alamat_jalan_perumahan ?? '0')),
-                "ayah_alamat_rt" => htmlspecialchars($dataJson->ayah->ayah_alamat_rt ?? '0'),
-                "ayah_alamat_rw" => htmlspecialchars($dataJson->ayah->ayah_alamat_rw ?? '0'),
-                "ayah_alamat_desa" => strtoupper(htmlspecialchars($dataJson->ayah->ayah_alamat_desa ?? '0')),
-                "ayah_alamat_kecamatan" => strtoupper(htmlspecialchars($dataJson->ayah->ayah_alamat_kecamatan ?? '0')),
-                "ayah_alamat_kabupaten" => strtoupper(htmlspecialchars($dataJson->ayah->ayah_alamat_kabupaten ?? '0')),
-                "ayah_alamat_telepon" => htmlspecialchars($dataJson->ayah->ayah_alamat_telepon ?? '0')
-            ];
-            $dataIbu = [
-                "ibu_nama" => strtoupper(htmlspecialchars($dataJson->ibu->ibu_nama ?? '0')),
-                "ibu_nik" => htmlspecialchars($dataJson->ibu->ibu_nik ?? '0'),
-                "ibu_no_kk" => htmlspecialchars($dataJson->ibu->ibu_no_kk ?? '0'),
-                "ibu_tempat_lahir" => strtoupper(htmlspecialchars($dataJson->ibu->ibu_tempat_lahir ?? '0')),
-                "ibu_tanggal_lahir" => htmlspecialchars($dataJson->ibu->ibu_tanggal_lahir ?? '1000-01-01'),
-                "ibu_agama_id" => htmlspecialchars($dataJson->ibu->ibu_agama_id ?? 0),
-                "ibu_alamat_jalan_perumahan" => strtoupper(htmlspecialchars($dataJson->ibu->ibu_alamat_jalan_perumahan ?? '0')),
-                "ibu_alamat_rt" => htmlspecialchars($dataJson->ibu->ibu_alamat_rt ?? '0'),
-                "ibu_alamat_rw" => htmlspecialchars($dataJson->ibu->ibu_alamat_rw ?? '0'),
-                "ibu_alamat_desa" => strtoupper(htmlspecialchars($dataJson->ibu->ibu_alamat_desa ?? '0')),
-                "ibu_alamat_kecamatan" => strtoupper(htmlspecialchars($dataJson->ibu->ibu_alamat_kecamatan ?? '0')),
-                "ibu_alamat_kabupaten" => strtoupper(htmlspecialchars($dataJson->ibu->ibu_alamat_kabupaten ?? '0')),
-                "ibu_alamat_telepon" => htmlspecialchars($dataJson->ibu->ibu_alamat_telepon ?? '0')
+            $dataOrangTua = [
+                "ayah_nama" => strtoupper(htmlspecialchars($dataJson->orang_tua->ayah_nama ?? '0')),
+                "ayah_nik" => htmlspecialchars($dataJson->orang_tua->ayah_nik ?? '0'),
+                "ayah_no_kk" => htmlspecialchars($dataJson->orang_tua->ayah_no_kk ?? '0'),
+                "ayah_tempat_lahir" => strtoupper(htmlspecialchars($dataJson->orang_tua->ayah_tempat_lahir ?? '0')),
+                "ayah_tanggal_lahir" => htmlspecialchars($dataJson->orang_tua->ayah_tanggal_lahir ?? '1000-01-01'),
+                "ayah_agama_id" => htmlspecialchars($dataJson->orang_tua->ayah_agama_id ?? 0),
+                "ayah_alamat_jalan_perumahan" => strtoupper(htmlspecialchars($dataJson->orang_tua->ayah_alamat_jalan_perumahan ?? '0')),
+                "ayah_alamat_rt" => htmlspecialchars($dataJson->orang_tua->ayah_alamat_rt ?? '0'),
+                "ayah_alamat_rw" => htmlspecialchars($dataJson->orang_tua->ayah_alamat_rw ?? '0'),
+                "ayah_alamat_desa" => strtoupper(htmlspecialchars($dataJson->orang_tua->ayah_alamat_desa ?? '0')),
+                "ayah_alamat_kecamatan" => strtoupper(htmlspecialchars($dataJson->orang_tua->ayah_alamat_kecamatan ?? '0')),
+                "ayah_alamat_kabupaten" => strtoupper(htmlspecialchars($dataJson->orang_tua->ayah_alamat_kabupaten ?? '0')),
+                "ayah_alamat_telepon" => htmlspecialchars($dataJson->orang_tua->ayah_alamat_telepon ?? '0'),
+                "ibu_nama" => strtoupper(htmlspecialchars($dataJson->orang_tua->ibu_nama ?? '0')),
+                "ibu_nik" => htmlspecialchars($dataJson->orang_tua->ibu_nik ?? '0'),
+                "ibu_no_kk" => htmlspecialchars($dataJson->orang_tua->ibu_no_kk ?? '0'),
+                "ibu_tempat_lahir" => strtoupper(htmlspecialchars($dataJson->orang_tua->ibu_tempat_lahir ?? '0')),
+                "ibu_tanggal_lahir" => htmlspecialchars($dataJson->orang_tua->ibu_tanggal_lahir ?? '1000-01-01'),
+                "ibu_agama_id" => htmlspecialchars($dataJson->orang_tua->ibu_agama_id ?? 0),
+                "ibu_alamat_jalan_perumahan" => strtoupper(htmlspecialchars($dataJson->orang_tua->ibu_alamat_jalan_perumahan ?? '0')),
+                "ibu_alamat_rt" => htmlspecialchars($dataJson->orang_tua->ibu_alamat_rt ?? '0'),
+                "ibu_alamat_rw" => htmlspecialchars($dataJson->orang_tua->ibu_alamat_rw ?? '0'),
+                "ibu_alamat_desa" => strtoupper(htmlspecialchars($dataJson->orang_tua->ibu_alamat_desa ?? '0')),
+                "ibu_alamat_kecamatan" => strtoupper(htmlspecialchars($dataJson->orang_tua->ibu_alamat_kecamatan ?? '0')),
+                "ibu_alamat_kabupaten" => strtoupper(htmlspecialchars($dataJson->orang_tua->ibu_alamat_kabupaten ?? '0')),
+                "ibu_alamat_telepon" => htmlspecialchars($dataJson->orang_tua->ibu_alamat_telepon ?? '0')
             ];
             if(isset($dataJson->difabel_image)){
                 $dataDifabel['difabel_image'] = $dataJson->difabel_image;
@@ -318,9 +306,8 @@ class DashboardController extends ResourceController
                         }
                     }
                 }
-                $orangtua = $dataAyah + $dataIbu;
                 $orangtuaModel =  new \App\Models\OrangTuaModel();
-                $orangtuaModel->where('difabel_no_urut',$difabel['difabel_no_urut'])->set($orangtua)->update();
+                $orangtuaModel->where('difabel_no_urut',$difabel['difabel_no_urut'])->set($dataOrangTua)->update();
                 return $this->respond(["status" => 1,"message"=>"Berhasil mengupdate data, silahkan tunggu untuk admin memvalidasi data",'data' => []], 200);  
             }else{
                 if($difabel['difabel_image'] != 'kosong.png'){

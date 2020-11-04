@@ -6,7 +6,7 @@ class MyRule{
     {
         $userModel = new \App\Models\UserModel();
         $user = $userModel->where('user_id',$user_id)->first();
-        if(password_verify($user_password,$user['user_password'])){
+        if(md5($user_password) == $user['user_password']){
             return true;
         }
         return false;

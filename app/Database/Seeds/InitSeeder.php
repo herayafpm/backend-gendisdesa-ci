@@ -12,5 +12,8 @@ class InitSeeder extends \CodeIgniter\Database\Seeder
     $this->call('KebutuhanPerawatanSeeder');
     $this->call('KeterampilanSeeder');
     $this->call('KondisiDifabelSeeder');
+    $this->call('KondisiOrangTuaSeeder');
+    $this->call('OrganisasiSeeder');
+    $this->call('PekerjaanSeeder');
   }
 }

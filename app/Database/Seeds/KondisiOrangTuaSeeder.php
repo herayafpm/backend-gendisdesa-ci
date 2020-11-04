@@ -1,6 +1,6 @@
 <?php namespace App\Database\Seeds;
 
-class KondisiDifabelSeeder extends \CodeIgniter\Database\Seeder
+class KondisiOrangTuaSeeder extends \CodeIgniter\Database\Seeder
 {
   public function run()
   {

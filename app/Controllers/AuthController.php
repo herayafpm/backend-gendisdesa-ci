@@ -45,9 +45,9 @@ class AuthController extends ResourceController
                     $jwt = JWT::encode($user,$config->JWTKey);
                     $user['token'] = $jwt;
                     $this->model->setLastLogin($user['user_nik']);
-                    return $this->respond(["status" => 1,"message" => 'Berhasil Login',"data"=>$user], 200);  
+                    return $this->respond(["status" => 1,"message" => 'Berhasil Login, akan diarahkan ke halaman selanjutnya',"data"=>$user], 200);  
                 }else{
-                    return $this->respond(["status" => 0,"message"=>"Akun anda belum aktif, akan diproses 1 * 24jam",'data' => []], 500); 
+                    return $this->respond(["status" => 0,"message"=>"Akun anda belum aktif, akan diproses 1 * 24jam",'data' => []], 400); 
                 }
             }else{
                 return $this->respond(["status" => 0,"message"=>"nik atau password salah",'data' => []], 400); 
@@ -163,7 +163,7 @@ class AuthController extends ResourceController
         $data = [
             'user_nik' => htmlspecialchars($dataJson->user_nik ?? ''),
             'user_nama' => strtoupper(htmlspecialchars($dataJson->user_nama ?? '')),
-            'user_tempat_lahir' => htmlspecialchars($dataJson->user_tempat_lahir ?? ''),
+            'user_tempat_lahir' => strtoupper(htmlspecialchars($dataJson->user_tempat_lahir ?? '')),
             'user_tanggal_lahir' => strtoupper(htmlspecialchars($dataJson->user_tanggal_lahir ?? '')),
             'user_jk' => htmlspecialchars($dataJson->user_jk ?? ''),
             'user_telepon' => strtoupper(htmlspecialchars($dataJson->user_telepon ?? '')),
@@ -180,8 +180,6 @@ class AuthController extends ResourceController
             return $this->respond(["status" => 0,"message"=>"validation error",'data' => $validation->getErrors()], 400); 
         }
         try {
-            $data['user_status'] = 1;
-            $data['status_verif'] = 1;
             $save = $this->model->insertUser($data);
             if($save){
                 return $this->respond(["status" => 1,"message"=>"Berhasil mendaftar, silahkan login",'data' => []], 200);  
@@ -199,7 +197,7 @@ class AuthController extends ResourceController
         $user_id = $this->request->user['user_id'];
         $changePassRule = [
             'old_password' => [
-                'label'  => 'Password Lama',
+                'label'  => 'Password Sekarang',
                 'rules'  => 'required|cek_pass['.$user_id.']',
                 'errors' => [
                     'required' => '{field} tidak boleh kosong',

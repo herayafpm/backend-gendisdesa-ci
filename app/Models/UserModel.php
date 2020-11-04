@@ -19,7 +19,8 @@ class UserModel extends Model
     protected function hashPassword(array $data)
     {
         if (!isset($data['data']['user_password'])) return $data;
-        $data['data']['user_password'] = password_hash($data['data']['user_password'], PASSWORD_DEFAULT);
+        // $data['data']['user_password'] = password_hash($data['data']['user_password'], PASSWORD_DEFAULT);
+        $data['data']['user_password'] = md5($data['data']['user_password']);
         return $data;
     }
     protected function setLogin(array $data)
@@ -50,7 +51,7 @@ class UserModel extends Model
     {
         $auth = $this->where('user_nik',$user_nik)->first();
         if($auth){
-            if(password_verify($user_password,$auth['user_password'])){
+            if(md5($user_password) == $auth['user_password']){
                 return $auth;
             }else{
                 return false;
