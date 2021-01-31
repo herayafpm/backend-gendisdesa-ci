@@ -1,0 +1,28 @@
+POST auth
+
+<!-- Request Normal -->
+{
+  "user_nik":"330411",
+  "user_password":"123456"
+}
+
+<!-- Response when nik or password is not valid -->
+{
+  "status":0,
+  "message":"nik atau password salah",
+  "data":[]
+}
+<!-- Response Success but user not active or not verif -->
+{
+  "status": 0,
+  "message":"Akun anda belum aktif, akan diproses 1 * 24jam",
+  "data" => []
+}
+
+<!-- Response success -->
+{
+  "nik":"330411",
+  ...,
+  "token":"najjdilaji1l231lj3lkj2"
+}
+

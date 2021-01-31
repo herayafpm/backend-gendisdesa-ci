@@ -1,6 +1,6 @@
 <?php
 
-function upload_file($image_difabel)
+function upload_file($image_difabel,$namaFile = NULL)
 {
   // upload file
   $image_difabelData = base64_decode($image_difabel);
@@ -10,7 +10,11 @@ function upload_file($image_difabel)
   $acceptType = ['image/jpeg','image/png','image/jpg'];
   if(in_array($mime_type,$acceptType)){
     [$image,$imageType] = explode('/',$mime_type);
-    $fileName = uniqid('img_').time()."_".rand(1,100).".$imageType";
+    if($namaFile != null){
+      $fileName = $namaFile.".$imageType";
+    }else{
+      $fileName = uniqid('img_').time()."_".rand(1,100).".$imageType";
+    }
     $filePath = FCPATH.'uploads/'.$fileName;
     $image = file_put_contents($filePath, $image_difabelData);
     $ImageSize = filesize($filePath) / 1024;

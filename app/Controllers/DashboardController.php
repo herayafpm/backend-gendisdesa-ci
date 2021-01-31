@@ -128,6 +128,8 @@ class DashboardController extends ResourceController
         $dataJson->user_daftar = $user['user_nik'];
         // upload file
         try {
+            helper('database_validation');
+            cekNIK($dataJson->difabel_nik);
             $noUrut = $this->model->getNoUrut();
             if(isset($dataJson->difabel_image) && !empty($dataJson->difabel_image)){
                 helper('upload_file');
